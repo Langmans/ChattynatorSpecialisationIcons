@@ -1,10 +1,10 @@
 ## Interface: 120000, 120001
 ## Title: Chattynator Specialisation Icons
-## Version: 1.0.0
+## Version: @project-version@
 ## Notes: Adds specialisation icons to messages from players in Chattynator.
 ## RequiredDeps: Chattynator
 ## OptionalDeps: _DebugLog, LibSpecialization
-## Author: Langmans
+## Author: @project-author@
 
 Libs\LibSpecialization\LibStub\LibStub.lua
 Libs\LibSpecialization\LibSpecialization.lua
