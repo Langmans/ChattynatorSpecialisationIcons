@@ -7,15 +7,17 @@
 
 ## ✨ Features
 
-* **Visual Spec Identification:** Automatically displays icons for players in your Guild or Group.
+* **Visual Spec Identification:** Automatically displays icons for players in your Guild or Group (if they also have LibSpecialisation in one of their addons).
 * **Dynamic Injection:** Uses the Chattynator API to modify text without breaking player links or chat functionality.
 * **Performance Focused:** Features a metatable-based caching system for icons to ensure minimal CPU usage.
-* **Real-time Updates:** Synchronizes with `LibSpecialization` to reflect spec changes immediately.
+* **Real-time Updates:** Synchronizes with `LibSpecialization` from other people to reflect spec changes immediately.
 
 ## 🛠 Requirements
 
 This addon is a module and requires the following to function:
 * **[Chattynator](https://www.curseforge.com/wow/addons/chattynator)** (Core Addon)
+
+Also, other raid/party members or guild members will need at least [one addon that uses LibSpecialisation](https://www.curseforge.com/wow/addons/libspecialization/relations/dependents), such as BigWigs or DBM. If you get messages from people without an icon, it means you havent received their specialization info yet or they don't have any addon that has LibSpecialization embedded.
 
 ### Optional Dependencies
 * **_DebugLog**: Enables technical logging via `DLAPI`.
@@ -28,7 +30,7 @@ This addon is a module and requires the following to function:
     `_retail_/Interface/AddOns/ChattynatorSpecialisationIcons`
 3.  Ensure the addon is enabled in the Character Selection screen.
 
-## ⌨️ How it Works
+## ⌨️ How it Works (techincal details)
 
 The addon hooks into Chattynator's modifier API. When a message is received:
 1.  It checks the sender's name against a known database of specialization IDs collected from `LibSpecialization`.
