@@ -1,6 +1,6 @@
 ## Interface: 120000, 120001
 ## Title: Chattynator Specialisation Icons
-## Version: 0.0.1
+## Version: 1.0.0
 ## Notes: Adds specialisation icons to messages from players in Chattynator.
 ## RequiredDeps: Chattynator
 ## OptionalDeps: _DebugLog, LibSpecialization
