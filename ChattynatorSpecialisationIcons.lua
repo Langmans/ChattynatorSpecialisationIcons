@@ -54,8 +54,11 @@ do
 end
 
 local function update(channel, playerName, specId)
-    debug('%s~playerName=%q, specId=%q, icon=%s', channel, playerName, specId, icons[specId])
-    playerIcons[playerName] = icons[specId]
+    local icon = icons[specId]
+    if not playerIcons[playerName] or playerIcons[playerName] ~= icon then
+        debug('%s~playerName=%q, specId=%q, icon=%s', channel, playerName, specId, icon)
+        playerIcons[playerName] = icons[specId]
+    end
 end
 
 local updatePlayerSpec
@@ -80,9 +83,11 @@ EventRegistry:RegisterFrameEventAndCallback("PLAYER_LOGIN", function()
     updatePlayerSpec()
     LibSpecialization.RequestGuildSpecialization()
 
-    EventRegistry:RegisterFrameEventAndCallback("GUILD_ROSTER_UPDATE", function(canRequestRosterUpdate)
-        debug('guild~GUILD_ROSTER_UPDATE, canRequestRosterUpdate=%q', canRequestRosterUpdate)
-        LibSpecialization.RequestGuildSpecialization()
+    EventRegistry:RegisterFrameEventAndCallback("GUILD_ROSTER_UPDATE", function(_, canRequestRosterUpdate)
+        debug('guild~GUILD_ROSTER_UPDATE, canRequestRosterUpdate=%q', canRequestRosterUpdate or false)
+        if canRequestRosterUpdate then
+            LibSpecialization.RequestGuildSpecialization()
+        end
     end)
 
 end)
