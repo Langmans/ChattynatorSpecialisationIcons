@@ -17,7 +17,7 @@
 This addon is a module and requires the following to function:
 * **[Chattynator](https://www.curseforge.com/wow/addons/chattynator)** (Core Addon)
 
-Also, other raid/party members or guild members will need at least [one addon that uses LibSpecialisation](https://www.curseforge.com/wow/addons/libspecialization/relations/dependents), such as BigWigs or DBM. If you get messages from people without an icon, it means you havent received their specialization info yet or they don't have any addon that has LibSpecialization embedded.
+Also, other raid/party members or guild members will need at least [one addon that uses LibSpecialisation](https://www.curseforge.com/wow/addons/libspecialization/relations/dependents), such as BigWigs or DBM. If you get messages from people without an icon, it means you haven't received their specialization info yet or they don't have any addon that has LibSpecialization embedded.
 
 ### Optional Dependencies
 * **_DebugLog**: Enables technical logging via `DLAPI`.
