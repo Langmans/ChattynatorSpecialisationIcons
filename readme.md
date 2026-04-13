@@ -30,18 +30,12 @@ Also, other raid/party members or guild members will need at least [one addon th
     `_retail_/Interface/AddOns/ChattynatorSpecialisationIcons`
 3.  Ensure the addon is enabled in the Character Selection screen.
 
-## ⌨️ How it Works (techincal details)
+## ⌨️ How it Works (technical details)
 
 The addon hooks into Chattynator's modifier API. When a message is received:
 1.  It checks the sender's name against a known database of specialization IDs collected from `LibSpecialization`.
 2.  It converts the spec ID into a texture markup string.
 3.  It modifies the chat string to place the icon immediately following the player's name link.
-
-## 📜 Technical Info
-
-* **Author:** Langmans
-* **Version:** 0.0.1
-* **Interface Compatibility:** 120000, 120001 (Midnight)
 
 ---
 
