@@ -1,0 +1,6 @@
+externals:
+    Libs/LibSpecialization: https://github.com/BigWigsMods/LibSpecialization.git/LibSpecialization
+
+ignore:
+  - settings.json
+  #- Libs/LibDualSpec-1.0/LibStub.lua
