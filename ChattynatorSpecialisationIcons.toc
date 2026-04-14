@@ -6,7 +6,7 @@
 ## OptionalDeps: _DebugLog, LibSpecialization
 ## Author: @project-author@
 
-Libs\LibSpecialization\LibStub\LibStub.lua
+Libs\LibStub\LibStub.lua
 Libs\LibSpecialization\LibSpecialization.lua
 
 ChattynatorSpecialisationIcons.lua

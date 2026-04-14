@@ -1,5 +1,8 @@
 externals:
     Libs/LibSpecialization: https://github.com/BigWigsMods/LibSpecialization.git/LibSpecialization
+    libs/LibStub: 
+        url: svn://svn.wowace.com/wow/libstub/mainline/trunk
+        tag: latest
 
 ignore:
   - settings.json
