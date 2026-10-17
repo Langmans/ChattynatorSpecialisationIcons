@@ -1,5 +1,6 @@
 # Chattynator Specialisation Icons
 
+[![Release](https://img.shields.io/github/v/release/Langmans/ChattynatorSpecialisationIcons?include_prereleases&sort=semver)](https://github.com/Langmans/ChattynatorSpecialisationIcons/releases)
 [![Game Version](https://img.shields.io/badge/WoW-12.0.0-blue.svg)](https://worldofwarcraft.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
