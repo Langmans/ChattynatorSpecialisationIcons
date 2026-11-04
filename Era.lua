@@ -201,27 +201,6 @@ for classID = 1, 20 do
     if info then classIDs[info.classFile] = classID end
 end
 
--- Per class, its trees in the talent frame's order as Retail's specialisation IDs, for icon sets
--- made for Retail's (Eltruism's): the Druid's third tree is Restoration, Retail's third Guardian.
-local TREE_SPECS = {
-    WARRIOR = { 71, 72, 73 },
-    PALADIN = { 65, 66, 70 },
-    HUNTER = { 253, 254, 255 },
-    ROGUE = { 259, 260, 261 },
-    PRIEST = { 256, 257, 258 },
-    SHAMAN = { 262, 263, 264 },
-    MAGE = { 62, 63, 64 },
-    WARLOCK = { 265, 266, 267 },
-    DRUID = { 102, 103, 105 },
-}
-for classFile, specs in pairs(TREE_SPECS) do
-    local classID = classIDs[classFile]
-    for tree, specId in ipairs(specs) do
-        local _, _, _, icon = GetSpecializationInfoForClassID(classID, tree)
-        ns.specOfIcon[icon] = specId
-    end
-end
-
 ---@param event string
 ---@param guid string
 local function onTalentsReady(event, guid)

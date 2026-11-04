@@ -4,7 +4,7 @@
 ## Version: @project-version@
 ## Notes: Adds specialisation icons to messages from players in Chattynator.
 ## RequiredDeps: Chattynator
-## OptionalDeps: _DebugLog, LibSpecialization, TacoTip, ElvUI_EltreumUI
+## OptionalDeps: _DebugLog, LibSpecialization, TacoTip
 ## Author: @project-author@
 
 Libs\LibStub\LibStub.lua

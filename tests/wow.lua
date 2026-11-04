@@ -21,8 +21,6 @@
 ---@field specId number? Forever: the player's spec, default 70
 ---@field debugLog boolean? _DebugLog is loaded
 ---@field tacoTip boolean? TacoTip's LibClassicInspector is loaded (Classic Era)
----@field eltruism boolean? Eltruism (ElvUI_EltreumUI) is loaded
----@field fontSize number? Chattynator's message font size in its current profile; none: no profile yet
 
 local PLAYER = "Me-Realm"
 local PLAYER_CLASS = 2
@@ -74,7 +72,7 @@ function NewClient(options)
     ---@param name string
     ---@return string?
     function client:Icon(name)
-        return self:Chat(name):match("^|Hplayer:[^|]+|h%[(|T[^|]+|t)")
+        return self:Chat(name):match("^|Hplayer:[^|]+|h%[(|T%d+:0:0|t)")
     end
 
     ---An addon message arriving from sender.
@@ -149,28 +147,6 @@ function NewClient(options)
     _G.CreateSimpleTextureMarkup = function(file, width, height)
         return ("|T%s:%d:%d|t"):format(file, width, height)
     end
-    _G.CreateTextureMarkup = function(file, fileWidth, fileHeight, width, height, left, right, top, bottom)
-        return ("|T%s:%d:%d:0:0:%d:%d:%d:%d:%d:%d|t"):format(
-            file,
-            width,
-            height,
-            fileWidth,
-            fileHeight,
-            left * fileWidth,
-            right * fileWidth,
-            top * fileHeight,
-            bottom * fileHeight
-        )
-    end
-    -- Chattynator's saved settings: a profile per name, the character's current one by name.
-    client.profile = { message_font_size = options.fontSize }
-    _G.CHATTYNATOR_CONFIG = options.fontSize and { Profiles = { Mine = client.profile } } or nil
-    _G.CHATTYNATOR_CURRENT_PROFILE = options.fontSize and "Mine" or nil
-    _G.C_AddOns = {
-        IsAddOnLoaded = function(name)
-            return name == "ElvUI_EltreumUI" and options.eltruism == true
-        end,
-    }
     _G.GetNormalizedRealmName = function()
         return "Realm"
     end
