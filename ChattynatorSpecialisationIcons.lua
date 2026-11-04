@@ -28,6 +28,9 @@ end
 local ELTRUISM = "ElvUI_EltreumUI"
 local ELTRUISM_ICONS = "Interface\\AddOns\\ElvUI_EltreumUI\\Media\\Details\\spec_icons_eltruism.tga"
 local ATLAS_SIZE, ATLAS_CELLS = 512, 8
+-- The icon's size in chat, as Eltruism's own loot icons have it. With texture coordinates a size of
+-- 0 is not the text's height (as for a whole file) but a smaller one, set against the line's top.
+local CHAT_ICON_SIZE = 12
 -- Per specialisation ID, its cell as column + row * ATLAS_CELLS.
 ---@type table<number, number>
 local ATLAS_CELL = {
@@ -88,7 +91,17 @@ local function markupOf(icon)
     local column, row = cell % ATLAS_CELLS, math.floor(cell / ATLAS_CELLS)
     local left, top = column / ATLAS_CELLS, row / ATLAS_CELLS
     local size = 1 / ATLAS_CELLS
-    return CreateTextureMarkup(ELTRUISM_ICONS, ATLAS_SIZE, ATLAS_SIZE, 0, 0, left, left + size, top, top + size)
+    return CreateTextureMarkup(
+        ELTRUISM_ICONS,
+        ATLAS_SIZE,
+        ATLAS_SIZE,
+        CHAT_ICON_SIZE,
+        CHAT_ICON_SIZE,
+        left,
+        left + size,
+        top,
+        top + size
+    )
 end
 
 ---Chat markup per icon file, built once per icon.

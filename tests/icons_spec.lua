@@ -41,7 +41,7 @@ end)
 describe("with Eltruism loaded", function()
     ---Eltruism's spec icon in the cell at column, row of its 8 by 8 atlas.
     local function eltruism(column, row)
-        return ("|TInterface\\AddOns\\ElvUI_EltreumUI\\Media\\Details\\spec_icons_eltruism.tga:0:0:0:0:512:512:%d:%d:%d:%d|t"):format(
+        return ("|TInterface\\AddOns\\ElvUI_EltreumUI\\Media\\Details\\spec_icons_eltruism.tga:12:12:0:0:512:512:%d:%d:%d:%d|t"):format(
             column * 64,
             column * 64 + 64,
             row * 64,
