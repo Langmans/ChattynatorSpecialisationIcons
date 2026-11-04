@@ -22,6 +22,11 @@ describe("the chat line", function()
         assert.equal("|Hplayer:Me-Realm:1:GUILD|h[" .. icon(203) .. "Me]|h: hello", client:Chat("Me-Realm"))
     end)
 
+    it("finds a player on the own realm, whom Chattynator names without the realm", function()
+        local client = NewClient()
+        assert.equal("|Hplayer:Me:1:GUILD|h[" .. icon(203) .. "Me]|h: hello", client:Chat("Me"))
+    end)
+
     it("stays as it is for a player without a known icon", function()
         local client = NewClient()
         assert.equal("|Hplayer:Bob-Realm:1:GUILD|h[Bob]|h: hello", client:Chat("Bob-Realm"))

@@ -67,7 +67,8 @@ end
 ---@param data ChattynatorMessage
 local function addIcon(data)
     local player = data.typeInfo.player
-    local markup = player and player.name and playerMarkups[player.name] ---@type string?
+    -- Chattynator names a player on the own realm without the realm (Ambiguate "none").
+    local markup = player and player.name and playerMarkups[ns.FullName(player.name)] ---@type string?
     if markup then data.text = gsub(data.text, "(|Hplayer:[^|]+|h)(%[?)", "%1%2" .. markup) end
 end
 Chattynator.API.AddModifier(addIcon)
