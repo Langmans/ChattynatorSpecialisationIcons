@@ -35,6 +35,7 @@ Players in `/say`, whispers or trade who run none of these get no icon.
 * **_DebugLog**: Enables technical logging via `DLAPI`.
 * **LibSpecialization**: Handled internally, but supports standalone versions.
 * **TacoTip**: More icons on Classic Era (see above).
+* **Eltruism** (ElvUI_EltreumUI): while it is loaded, the icons are Eltruism's spec icons (the set it gives Details) instead of the game's. On Classic Era each talent tree shows the icon of its Retail specialisation (a Druid's Restoration tree as Restoration). The file is used from Eltruism's own folder.
 
 ## 📦 Installation
 
@@ -50,6 +51,8 @@ The addon hooks into Chattynator's modifier API. When a message is received:
 2.  It places the icon's texture markup inside the player's name link, after the opening bracket.
 
 `ChattynatorSpecialisationIcons.lua` keeps one icon file ID per player and does the chat part; on Retail and Forever it fills them from `LibSpecialization` (spec ID to icon via `GetSpecializationInfoForSpecID`).
+
+With Eltruism loaded, an icon whose specialisation is known is drawn from `Interface\AddOns\ElvUI_EltreumUI\Media\Details\spec_icons_eltruism.tga`: a 512 by 512 atlas of 64 pixel cells in Details' layout, by Retail specialisation ID. Where LibSpecialization runs, the spec ID comes with the icon; on Classic Era each class's trees map to Retail's IDs in order (`TREE_SPECS` in `Era.lua`). An icon without a known specialisation keeps the game's.
 
 `Era.lua` runs only where LibSpecialization does not:
 

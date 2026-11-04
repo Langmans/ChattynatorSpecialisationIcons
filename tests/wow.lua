@@ -21,6 +21,7 @@
 ---@field specId number? Forever: the player's spec, default 70
 ---@field debugLog boolean? _DebugLog is loaded
 ---@field tacoTip boolean? TacoTip's LibClassicInspector is loaded (Classic Era)
+---@field eltruism boolean? Eltruism (ElvUI_EltreumUI) is loaded
 
 local PLAYER = "Me-Realm"
 local PLAYER_CLASS = 2
@@ -72,7 +73,7 @@ function NewClient(options)
     ---@param name string
     ---@return string?
     function client:Icon(name)
-        return self:Chat(name):match("^|Hplayer:[^|]+|h%[(|T%d+:0:0|t)")
+        return self:Chat(name):match("^|Hplayer:[^|]+|h%[(|T[^|]+|t)")
     end
 
     ---An addon message arriving from sender.
@@ -147,6 +148,24 @@ function NewClient(options)
     _G.CreateSimpleTextureMarkup = function(file, width, height)
         return ("|T%s:%d:%d|t"):format(file, width, height)
     end
+    _G.CreateTextureMarkup = function(file, fileWidth, fileHeight, width, height, left, right, top, bottom)
+        return ("|T%s:%d:%d:0:0:%d:%d:%d:%d:%d:%d|t"):format(
+            file,
+            width,
+            height,
+            fileWidth,
+            fileHeight,
+            left * fileWidth,
+            right * fileWidth,
+            top * fileHeight,
+            bottom * fileHeight
+        )
+    end
+    _G.C_AddOns = {
+        IsAddOnLoaded = function(name)
+            return name == "ElvUI_EltreumUI" and options.eltruism == true
+        end,
+    }
     _G.GetNormalizedRealmName = function()
         return "Realm"
     end

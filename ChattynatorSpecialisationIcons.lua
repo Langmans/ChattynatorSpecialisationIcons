@@ -22,6 +22,75 @@ local function debug(...)
     end
 end
 
+-- With Eltruism loaded, its spec icons (made for Details) replace the game's. The file stays
+-- Eltruism's: it is used from Eltruism's folder, never copied. It is an 8 by 8 grid of 64 pixel
+-- cells in Details' layout, by specialisation ID as Retail numbers them.
+local ELTRUISM = "ElvUI_EltreumUI"
+local ELTRUISM_ICONS = "Interface\\AddOns\\ElvUI_EltreumUI\\Media\\Details\\spec_icons_eltruism.tga"
+local ATLAS_SIZE, ATLAS_CELLS = 512, 8
+-- Per specialisation ID, its cell as column + row * ATLAS_CELLS.
+---@type table<number, number>
+local ATLAS_CELL = {
+    [250] = 0,
+    [251] = 1,
+    [252] = 2, -- Death Knight
+    [102] = 3,
+    [103] = 4,
+    [104] = 5,
+    [105] = 6, -- Druid
+    [253] = 7,
+    [254] = 8,
+    [255] = 9, -- Hunter
+    [62] = 10,
+    [63] = 11,
+    [64] = 12, -- Mage
+    [268] = 13,
+    [270] = 14,
+    [269] = 15, -- Monk
+    [65] = 16,
+    [66] = 17,
+    [70] = 18, -- Paladin
+    [256] = 19,
+    [257] = 20,
+    [258] = 21, -- Priest
+    [259] = 22,
+    [260] = 23,
+    [261] = 24, -- Rogue
+    [262] = 25,
+    [263] = 26,
+    [264] = 27, -- Shaman
+    [265] = 28,
+    [266] = 29,
+    [267] = 30, -- Warlock
+    [71] = 31,
+    [72] = 32,
+    [73] = 33, -- Warrior
+    [577] = 34,
+    [581] = 35, -- Demon Hunter
+    [1467] = 36,
+    [1468] = 37,
+    [1473] = 38, -- Evoker
+    [1480] = 39, -- Demon Hunter, Devourer
+}
+
+---Per icon file, the specialisation it stands for (Retail's IDs), where known: from
+---LibSpecialization, or from a Classic Era tree (Era.lua).
+---@type table<number, number>
+ns.specOfIcon = {}
+
+---Chat markup for an icon: Eltruism's version of it when Eltruism is loaded and has one, else the
+---game's.
+---@param icon number
+---@return string
+local function markupOf(icon)
+    local cell = ATLAS_CELL[ns.specOfIcon[icon]]
+    if not cell or not C_AddOns.IsAddOnLoaded(ELTRUISM) then return CreateSimpleTextureMarkup(icon, 0, 0) end
+    local column, row = cell % ATLAS_CELLS, math.floor(cell / ATLAS_CELLS)
+    local left, top = column / ATLAS_CELLS, row / ATLAS_CELLS
+    local size = 1 / ATLAS_CELLS
+    return CreateTextureMarkup(ELTRUISM_ICONS, ATLAS_SIZE, ATLAS_SIZE, 0, 0, left, left + size, top, top + size)
+end
+
 ---Chat markup per icon file, built once per icon.
 ---@type table<number, string>
 local markups = setmetatable({}, {
@@ -29,7 +98,7 @@ local markups = setmetatable({}, {
     ---@param icon number
     ---@return string
     __index = function(self, icon)
-        local markup = CreateSimpleTextureMarkup(icon, 0, 0)
+        local markup = markupOf(icon)
         self[icon] = markup
         return markup
     end,
@@ -83,6 +152,7 @@ local GetUnitName = GetUnitName
 ---@param specId number
 local function setSpec(name, specId)
     local _, _, _, icon = GetSpecializationInfoForSpecID(specId)
+    if icon then ns.specOfIcon[icon] = specId end
     ns.SetIcon(name, icon)
 end
 
