@@ -1,13 +1,14 @@
-## Interface: 120000, 120001, 16001
+## Interface: 120000, 120001, 16001, 11509
 ## Title: Chattynator Specialisation Icons
 ## Category: Chat
 ## Version: @project-version@
 ## Notes: Adds specialisation icons to messages from players in Chattynator.
 ## RequiredDeps: Chattynator
-## OptionalDeps: _DebugLog, LibSpecialization
+## OptionalDeps: _DebugLog, LibSpecialization, TacoTip
 ## Author: @project-author@
 
 Libs\LibStub\LibStub.lua
 Libs\LibSpecialization\LibSpecialization.lua
 
 ChattynatorSpecialisationIcons.lua
+Era.lua

@@ -1,0 +1,11 @@
+# Personal task notes, kept local.
+tasks/
+
+# Libraries the packager brings in (.pkgmeta externals).
+Libs/
+
+# Test tooling: Lua 5.1 and its rocks (tests/setup-lua.ps1 locally, the leafo actions in CI) and
+# the coverage data and reports.
+.lua/
+.luarocks/
+coverage/

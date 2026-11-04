@@ -4,6 +4,12 @@ externals:
         url: svn://svn.wowace.com/wow/libstub/mainline/trunk
         tag: latest
 
+# Files starting with a dot are left out by the packager already.
 ignore:
   - settings.json
-  #- Libs/LibDualSpec-1.0/LibStub.lua
+  - annotations
+  - coverage
+  - tests
+  - tasks
+  - chattynatorspecialisationicons-dev-1.rockspec
+  - stylua.toml

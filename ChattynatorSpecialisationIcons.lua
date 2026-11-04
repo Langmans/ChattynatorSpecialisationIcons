@@ -1,104 +1,113 @@
-local addonName, ns = ...
+-- Puts a player's specialisation icon inside their name link in Chattynator. The icons come from
+-- LibSpecialization where it runs (Retail, Forever); Era.lua finds them on Classic Era.
+local addonName = ... ---@type string
+local ns = select(2, ...) ---@type ChattynatorSpecialisationIconsNS
 
-local pcall = pcall
+local LibSpecialization = LibStub("LibSpecialization", true) ---@type LibSpecialization?
+local CreateSimpleTextureMarkup = CreateSimpleTextureMarkup
+local GetNormalizedRealmName = GetNormalizedRealmName
+local GetRealmName = GetRealmName
 local format = format
-local LibSpecialization = LibStub("LibSpecialization")
-
----@diagnostic disable-next-line: undefined-global
-local DLAPI = DLAPI
----@diagnostic disable-next-line: undefined-global
+local gsub = gsub
+local pcall = pcall
+local setmetatable = setmetatable
+local tostring = tostring
+local DLAPI = DLAPI ---@type DLAPI?
 local Chattynator = Chattynator
 
 local function debug(...)
     if DLAPI then
-        local status, result = pcall(format, ...)
-        if status then
-            DLAPI.DebugLog(addonName, result)
-        end
+        local ok, text = pcall(format, ...)
+        if ok then DLAPI.DebugLog(addonName, text) end
     end
 end
 
-local playerIcons = {}
+---Chat markup per icon file, built once per icon.
+---@type table<number, string>
+local markups = setmetatable({}, {
+    ---@param self table<number, string>
+    ---@param icon number
+    ---@return string
+    __index = function(self, icon)
+        local markup = CreateSimpleTextureMarkup(icon, 0, 0)
+        self[icon] = markup
+        return markup
+    end,
+})
 
--- simple metatable to cache spec icons
-local icons
-do
-    local CreateSimpleTextureMarkup = CreateSimpleTextureMarkup
-    local GetSpecializationInfoForSpecID = GetSpecializationInfoForSpecID
-    icons = setmetatable({}, {
-        __mode = "kv",
-        __index = function(self, key)
-            --local id, name, description, icon, role = GetSpecializationInfoForSpecID(key)
-            --debug('spec~id=%q, name=%q, description=%q, icon=%q, role=%q', id, name, description, icon, role)
+---@type table<string, string> markup per "Name-Realm"
+local playerMarkups = {}
 
-            local _, _, _, icon = GetSpecializationInfoForSpecID(key)
-            local markup = CreateSimpleTextureMarkup(icon, 0, 0)
-            debug('icons~%q=%q', key, markup)
-            self[key] = markup
-            return self[key]
-        end
-    })
+---"Name-Realm" for a name that may come without its realm.
+---@param name string
+---@return string
+function ns.FullName(name)
+    if name:find("-", 1, true) then return name end
+    return name .. "-" .. (GetNormalizedRealmName() or GetRealmName():gsub("[%s%-]", ""))
 end
 
-local disambiguatePlayerName
-do
-    local GetNormalizedRealmName = GetNormalizedRealmName
-    local GetRealmName = GetRealmName
-    function disambiguatePlayerName(playerName)
-        if not playerName:find("-") then
-            playerName = playerName .. '-' .. (GetNormalizedRealmName or GetRealmName)():gsub("[%s%-]", "")
-        end
-
-        return playerName
+---Sets the icon shown for a player, or removes it with nil.
+---@param name string
+---@param icon number? file ID
+function ns.SetIcon(name, icon)
+    name = ns.FullName(name)
+    local markup = icon and markups[icon] or nil ---@type string?
+    if playerMarkups[name] ~= markup then
+        playerMarkups[name] = markup
+        debug("%s: %s", name, tostring(markup))
     end
 end
 
-local function update(channel, playerName, specId)
-    local icon = icons[specId]
-    if not playerIcons[playerName] or playerIcons[playerName] ~= icon then
-        debug('%s~playerName=%q, specId=%q, icon=%s', channel, playerName, specId, icon)
-        playerIcons[playerName] = icons[specId]
-    end
+---@param name string
+---@return boolean
+function ns.HasIcon(name)
+    return playerMarkups[ns.FullName(name)] ~= nil
 end
 
-local updatePlayerSpec
-do
-    local GetUnitName = GetUnitName
-    function updatePlayerSpec()
-        update('player', disambiguatePlayerName(GetUnitName("player", true)), LibSpecialization.MySpecialization())
-    end
+---@param data ChattynatorMessage
+local function addIcon(data)
+    local player = data.typeInfo.player
+    local markup = player and player.name and playerMarkups[player.name] ---@type string?
+    if markup then data.text = gsub(data.text, "(|Hplayer:[^|]+|h)(%[?)", "%1%2" .. markup) end
+end
+Chattynator.API.AddModifier(addIcon)
+
+if not LibSpecialization then return end
+local Lib = LibSpecialization ---@type LibSpecialization
+
+local GetSpecializationInfoForSpecID = GetSpecializationInfoForSpecID
+local GetUnitName = GetUnitName
+
+---@param name string
+---@param specId number
+local function setSpec(name, specId)
+    local _, _, _, icon = GetSpecializationInfoForSpecID(specId)
+    ns.SetIcon(name, icon)
 end
 
-local buildSpecialisationInfoReceiver = function(channel)
-    return function(specId, _, _, playerName)
-        update(channel, disambiguatePlayerName(playerName), specId)
-    end
+local function updatePlayerSpec()
+    setSpec(GetUnitName("player", true), Lib.MySpecialization())
+end
+
+---@param specId number
+---@param role string
+---@param position string
+---@param name string
+local function onSpec(specId, role, position, name)
+    setSpec(name, specId)
+end
+
+---@param owner number EventRegistry's owner ID
+---@param canRequestRosterUpdate boolean
+local function onGuildRoster(owner, canRequestRosterUpdate)
+    if canRequestRosterUpdate then Lib.RequestGuildSpecialization() end
 end
 
 EventRegistry:RegisterFrameEventAndCallback("PLAYER_LOGIN", function()
-    LibSpecialization.RegisterPlayerSpecChange(ns, updatePlayerSpec)
-    LibSpecialization.RegisterGuild(ns, buildSpecialisationInfoReceiver('guild'))
-    LibSpecialization.RegisterGroup(ns, buildSpecialisationInfoReceiver('group'))
-
+    Lib.RegisterPlayerSpecChange(ns, updatePlayerSpec)
+    Lib.RegisterGuild(ns, onSpec)
+    Lib.RegisterGroup(ns, onSpec)
     updatePlayerSpec()
-    LibSpecialization.RequestGuildSpecialization()
-
-    EventRegistry:RegisterFrameEventAndCallback("GUILD_ROSTER_UPDATE", function(_, canRequestRosterUpdate)
-        debug('guild~GUILD_ROSTER_UPDATE, canRequestRosterUpdate=%q', canRequestRosterUpdate or false)
-        if canRequestRosterUpdate then
-            LibSpecialization.RequestGuildSpecialization()
-        end
-    end)
-
-end)
-
-Chattynator.API.AddModifier(function(data)
-    local playerName = data.typeInfo.player and data.typeInfo.player.name
-    local icon = playerName and playerIcons[playerName]
-	if icon then
-		debug('modifier~name=%q, icon=%q', playerName, icon)
-		data.text = gsub(data.text, "(|Hplayer:[^|]+|h)(%[?)", "%1%2" .. icon)
-
-		--Debug("race = %q, sex = %q, icon = %q", race, sex, icon)
-	end
+    Lib.RequestGuildSpecialization()
+    EventRegistry:RegisterFrameEventAndCallback("GUILD_ROSTER_UPDATE", onGuildRoster)
 end)
