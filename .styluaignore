@@ -1,2 +1,4 @@
 Libs/
 coverage/
+.lua/
+.luarocks/

@@ -1,7 +1,7 @@
 {
     "flavors": ["mainline", "forever", "classic_era"],
     "library": ["annotations/"],
-    "ignore": ["tests/", "coverage/", "Libs/", ".busted", ".luacov"],
+    "ignore": ["tests/", "coverage/", "Libs/", ".lua/", ".luarocks/", ".busted", ".luacov", "*.rockspec"],
     "diagnostics": {
         "enable": [
             "need-check-nil",
