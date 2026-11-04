@@ -39,9 +39,11 @@ describe("the chat line", function()
 end)
 
 describe("with Eltruism loaded", function()
-    ---Eltruism's spec icon in the cell at column, row of its 8 by 8 atlas.
-    local function eltruism(column, row)
-        return ("|TInterface\\AddOns\\ElvUI_EltreumUI\\Media\\Details\\spec_icons_eltruism.tga:12:12:0:0:512:512:%d:%d:%d:%d|t"):format(
+    ---Eltruism's spec icon in the cell at column, row of its 8 by 8 atlas, `size` tall (14 by default).
+    local function eltruism(column, row, size)
+        return ("|TInterface\\AddOns\\ElvUI_EltreumUI\\Media\\Details\\spec_icons_eltruism.tga:%d:%d:0:0:512:512:%d:%d:%d:%d|t"):format(
+            size or 14,
+            size or 14,
             column * 64,
             column * 64 + 64,
             row * 64,
@@ -61,6 +63,13 @@ describe("with Eltruism loaded", function()
     it("shows Eltruism's icon of a specialisation", function()
         local client = NewClient({ client = "forever", eltruism = true, specId = 254 })
         assert.equal(eltruism(0, 1), client:Icon("Me-Realm"), "Marksmanship")
+    end)
+
+    it("is as tall as Chattynator's message font, also after it changes", function()
+        local client = NewClient({ eltruism = true, fontSize = 19 })
+        assert.equal(eltruism(2, 2, 19), client:Icon("Me-Realm"))
+        client.profile.message_font_size = 24
+        assert.equal(eltruism(2, 2, 24), client:Icon("Me-Realm"))
     end)
 
     it("keeps the game's icon for one Eltruism has none of", function()

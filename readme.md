@@ -52,7 +52,7 @@ The addon hooks into Chattynator's modifier API. When a message is received:
 
 `ChattynatorSpecialisationIcons.lua` keeps one icon file ID per player and does the chat part; on Retail and Forever it fills them from `LibSpecialization` (spec ID to icon via `GetSpecializationInfoForSpecID`).
 
-With Eltruism loaded, an icon whose specialisation is known is drawn from `Interface\AddOns\ElvUI_EltreumUI\Media\Details\spec_icons_eltruism.tga`: a 512 by 512 atlas of 64 pixel cells in Details' layout, by Retail specialisation ID. Where LibSpecialization runs, the spec ID comes with the icon; on Classic Era each class's trees map to Retail's IDs in order (`TREE_SPECS` in `Era.lua`). An icon without a known specialisation keeps the game's.
+With Eltruism loaded, an icon whose specialisation is known is drawn from `Interface\AddOns\ElvUI_EltreumUI\Media\Details\spec_icons_eltruism.tga`: a 512 by 512 atlas of 64 pixel cells in Details' layout, by Retail specialisation ID. Where LibSpecialization runs, the spec ID comes with the icon; on Classic Era each class's trees map to Retail's IDs in order (`TREE_SPECS` in `Era.lua`). An icon without a known specialisation keeps the game's. Eltruism's icon is as tall as Chattynator's message font size, read from its current profile (`CHATTYNATOR_CONFIG`), since a size of 0 in a texture markup is the font object's own height, not the one Chattynator sets.
 
 `Era.lua` runs only where LibSpecialization does not:
 

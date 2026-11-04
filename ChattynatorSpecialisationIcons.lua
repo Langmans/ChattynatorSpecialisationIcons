@@ -10,7 +10,6 @@ local GetRealmName = GetRealmName
 local format = format
 local gsub = gsub
 local pcall = pcall
-local setmetatable = setmetatable
 local tostring = tostring
 local DLAPI = DLAPI ---@type DLAPI?
 local Chattynator = Chattynator
@@ -28,9 +27,10 @@ end
 local ELTRUISM = "ElvUI_EltreumUI"
 local ELTRUISM_ICONS = "Interface\\AddOns\\ElvUI_EltreumUI\\Media\\Details\\spec_icons_eltruism.tga"
 local ATLAS_SIZE, ATLAS_CELLS = 512, 8
--- The icon's size in chat, as Eltruism's own loot icons have it. With texture coordinates a size of
--- 0 is not the text's height (as for a whole file) but a smaller one, set against the line's top.
-local CHAT_ICON_SIZE = 12
+-- Eltruism's icon is as tall as Chattynator's message font: a size of 0 in the markup is the font
+-- object's own height, not the size Chattynator sets, and the icon came out small at the line's
+-- top. Chattynator's default size, for before its profile is read.
+local DEFAULT_FONT_SIZE = 14
 -- Per specialisation ID, its cell as column + row * ATLAS_CELLS.
 ---@type table<number, number>
 local ATLAS_CELL = {
@@ -81,44 +81,62 @@ local ATLAS_CELL = {
 ---@type table<number, number>
 ns.specOfIcon = {}
 
+---Chattynator's message font size ("Message font size"), from its current profile; its default
+---before the profile is there.
+---@return number
+local function fontSize()
+    local config = rawget(_G, "CHATTYNATOR_CONFIG") --[[@as {Profiles: table<string, {message_font_size: number?}>?}?]]
+    local profiles = config and config.Profiles
+    local profile = profiles and profiles[rawget(_G, "CHATTYNATOR_CURRENT_PROFILE") or "DEFAULT"]
+    return profile and profile.message_font_size or DEFAULT_FONT_SIZE
+end
+
 ---Chat markup for an icon: Eltruism's version of it when Eltruism is loaded and has one, else the
 ---game's.
 ---@param icon number
+---@param size number Eltruism's icon's size: the chat's font size
 ---@return string
-local function markupOf(icon)
+local function markupOf(icon, size)
     local cell = ATLAS_CELL[ns.specOfIcon[icon]]
     if not cell or not C_AddOns.IsAddOnLoaded(ELTRUISM) then return CreateSimpleTextureMarkup(icon, 0, 0) end
     local column, row = cell % ATLAS_CELLS, math.floor(cell / ATLAS_CELLS)
     local left, top = column / ATLAS_CELLS, row / ATLAS_CELLS
-    local size = 1 / ATLAS_CELLS
+    local cellSize = 1 / ATLAS_CELLS
     return CreateTextureMarkup(
         ELTRUISM_ICONS,
         ATLAS_SIZE,
         ATLAS_SIZE,
-        CHAT_ICON_SIZE,
-        CHAT_ICON_SIZE,
+        size,
+        size,
         left,
-        left + size,
+        left + cellSize,
         top,
-        top + size
+        top + cellSize
     )
 end
 
----Chat markup per icon file, built once per icon.
+-- Chat markup per icon file, built once per icon and font size: a new size starts a new set.
 ---@type table<number, string>
-local markups = setmetatable({}, {
-    ---@param self table<number, string>
-    ---@param icon number
-    ---@return string
-    __index = function(self, icon)
-        local markup = markupOf(icon)
-        self[icon] = markup
-        return markup
-    end,
-})
+local markups = {}
+local markupSize ---@type number?
 
----@type table<string, string> markup per "Name-Realm"
-local playerMarkups = {}
+---@param icon number
+---@return string
+local function markupFor(icon)
+    local size = fontSize()
+    if size ~= markupSize then
+        markups, markupSize = {}, size
+    end
+    local markup = markups[icon]
+    if not markup then
+        markup = markupOf(icon, size)
+        markups[icon] = markup
+    end
+    return markup
+end
+
+---@type table<string, number> icon file per "Name-Realm"
+local playerIcons = {}
 
 ---"Name-Realm" for a name that may come without its realm.
 ---@param name string
@@ -133,25 +151,24 @@ end
 ---@param icon number? file ID
 function ns.SetIcon(name, icon)
     name = ns.FullName(name)
-    local markup = icon and markups[icon] or nil ---@type string?
-    if playerMarkups[name] ~= markup then
-        playerMarkups[name] = markup
-        debug("%s: %s", name, tostring(markup))
+    if playerIcons[name] ~= icon then
+        playerIcons[name] = icon
+        debug("%s: %s", name, tostring(icon and markupFor(icon)))
     end
 end
 
 ---@param name string
 ---@return boolean
 function ns.HasIcon(name)
-    return playerMarkups[ns.FullName(name)] ~= nil
+    return playerIcons[ns.FullName(name)] ~= nil
 end
 
 ---@param data ChattynatorMessage
 local function addIcon(data)
     local player = data.typeInfo.player
     -- Chattynator names a player on the own realm without the realm (Ambiguate "none").
-    local markup = player and player.name and playerMarkups[ns.FullName(player.name)] ---@type string?
-    if markup then data.text = gsub(data.text, "(|Hplayer:[^|]+|h)(%[?)", "%1%2" .. markup) end
+    local icon = player and player.name and playerIcons[ns.FullName(player.name)] ---@type number?
+    if icon then data.text = gsub(data.text, "(|Hplayer:[^|]+|h)(%[?)", "%1%2" .. markupFor(icon)) end
 end
 Chattynator.API.AddModifier(addIcon)
 

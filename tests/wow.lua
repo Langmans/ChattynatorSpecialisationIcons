@@ -22,6 +22,7 @@
 ---@field debugLog boolean? _DebugLog is loaded
 ---@field tacoTip boolean? TacoTip's LibClassicInspector is loaded (Classic Era)
 ---@field eltruism boolean? Eltruism (ElvUI_EltreumUI) is loaded
+---@field fontSize number? Chattynator's message font size in its current profile; none: no profile yet
 
 local PLAYER = "Me-Realm"
 local PLAYER_CLASS = 2
@@ -161,6 +162,10 @@ function NewClient(options)
             bottom * fileHeight
         )
     end
+    -- Chattynator's saved settings: a profile per name, the character's current one by name.
+    client.profile = { message_font_size = options.fontSize }
+    _G.CHATTYNATOR_CONFIG = options.fontSize and { Profiles = { Mine = client.profile } } or nil
+    _G.CHATTYNATOR_CURRENT_PROFILE = options.fontSize and "Mine" or nil
     _G.C_AddOns = {
         IsAddOnLoaded = function(name)
             return name == "ElvUI_EltreumUI" and options.eltruism == true
