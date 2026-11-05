@@ -20,6 +20,10 @@ This addon is a module and requires the following to function:
 
 On Retail and WoW Forever, other raid/party members or guild members will need at least [one addon that uses LibSpecialisation](https://www.curseforge.com/wow/addons/libspecialization/relations/dependents), such as BigWigs or DBM. If you get messages from people without an icon, it means you haven't received their specialization info yet or they don't have any addon that has LibSpecialization embedded.
 
+### WoW Forever
+
+Forever has one specialisation per class and Classic-style talent trees. A player's icon is the icon of their talent tree with the most points, as LibSpecialization reports it; before a point is spent there is none.
+
 ### Classic Era
 
 Classic Era has talent trees instead of specialisations, and LibSpecialization does not run there. A player's icon is the icon of their talent tree with the most points. It comes from:
@@ -49,7 +53,7 @@ The addon hooks into Chattynator's modifier API. When a message is received:
 1.  It checks the sender's name ("Name-Realm") against the icons collected so far.
 2.  It places the icon's texture markup inside the player's name link, after the opening bracket.
 
-`ChattynatorSpecialisationIcons.lua` keeps one icon file ID per player and does the chat part; on Retail and Forever it fills them from `LibSpecialization` (spec ID to icon via `GetSpecializationInfoForSpecID`).
+`ChattynatorSpecialisationIcons.lua` keeps one icon file ID per player and does the chat part; on Retail and Forever it fills them from `LibSpecialization`. On Retail that reports a spec ID, whose icon comes from `GetSpecializationInfoForSpecID`. On Forever it reports the talent group ID of the tree with the most points (Forever has one spec per class); the game has no lookup from a group ID to an icon for other classes, so the addon carries the 27 trees' icon file IDs. They come from Forever's game data: a group's talents belong to a talent tree skill line (`SkillLineAbility`), whose `SpellIconFileID` is the tree's icon.
 
 `Era.lua` runs only where LibSpecialization does not:
 

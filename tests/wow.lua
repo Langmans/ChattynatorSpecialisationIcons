@@ -1,8 +1,9 @@
 -- A simulated client: the parts of the game, Chattynator and LibSpecialization the addon touches.
 -- NewClient() resets the globals, loads the .toc's own files and logs in.
 --
--- A tree's icon is classID * 100 + tree index (a Paladin's are 201, 202, 203). On Forever a spec's
--- icon is its spec ID + 5000.
+-- A tree's icon is classID * 100 + tree index (a Paladin's are 201, 202, 203). On Retail a spec's
+-- icon is its spec ID + 5000. On Forever LibSpecialization reports talent group IDs instead, whose
+-- icons are the game's own (the addon knows them; the client has no lookup for them).
 
 ---@class TestMember
 ---@field unit string "party1", "raid3"
@@ -13,12 +14,13 @@
 ---@field canInspect boolean? default true
 
 ---@class TestClientOptions
----@field client "era"|"forever"? default "era"
+---@field client "era"|"retail"|"forever"? default "era"
 ---@field trees number[]? the player's points per tree, default { 0, 5, 31 }
 ---@field guild boolean? in a guild, default true
 ---@field group TestMember[]? default none
 ---@field raid boolean? the group is a raid
----@field specId number? Forever: the player's spec, default 70
+---@field specId number|false? Retail: the player's spec ID, Forever: their top talent group ID;
+---false before a point is spent (LibSpecialization then reports none). Default 70
 ---@field debugLog boolean? _DebugLog is loaded
 ---@field tacoTip boolean? TacoTip's LibClassicInspector is loaded (Classic Era)
 
@@ -33,7 +35,7 @@ function NewClient(options)
         guild = options.guild ~= false,
         group = options.group or {},
         raid = options.raid or false,
-        specId = options.specId or 70,
+        specId = options.specId == nil and 70 or options.specId,
         combat = false,
         time = 0,
         events = {},
@@ -217,6 +219,7 @@ function NewClient(options)
         end,
     }
     _G.GetSpecializationInfoForSpecID = function(specId)
+        assert(type(specId) == "number", "Usage: GetSpecializationInfoForSpecID(specID [, gender])")
         return specId, "Spec", "", specId + 5000
     end
     _G.GetSpecializationInfoForClassID = function(classID, index)
@@ -254,9 +257,9 @@ function NewClient(options)
         end,
     }
 
-    -- LibStub with LibSpecialization where it runs: on Forever, not on Classic Era.
+    -- LibStub with LibSpecialization where it runs: on Retail and Forever, not on Classic Era.
     local libs = {}
-    if options.client == "forever" then
+    if options.client == "retail" or options.client == "forever" then
         local callbacks = {}
         client.lib = callbacks
         libs.LibSpecialization = {
@@ -270,7 +273,7 @@ function NewClient(options)
                 callbacks.group = fn
             end,
             MySpecialization = function()
-                return client.specId
+                return client.specId or nil
             end,
             RequestGuildSpecialization = function()
                 client.guildRequests = client.guildRequests + 1

@@ -28,7 +28,7 @@ DLAPI = {}
 ---@field RegisterPlayerSpecChange fun(owner: table, callback: fun())
 ---@field RegisterGuild fun(owner: table, callback: LibSpecializationCallback)
 ---@field RegisterGroup fun(owner: table, callback: LibSpecializationCallback)
----@field MySpecialization fun(): number
+---@field MySpecialization fun(): number? spec ID (on Forever a talent group ID), nil before a point is spent
 ---@field RequestGuildSpecialization fun()
 
 ---TacoTip's LibClassicInspector, the part this addon uses.

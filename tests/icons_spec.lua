@@ -298,9 +298,28 @@ describe("on Classic Era with TacoTip's LibClassicInspector", function()
     end)
 end)
 
-describe("on WoW Forever", function()
+for _, client in ipairs({ "retail", "forever" }) do
+    describe("with LibSpecialization (" .. client .. ")", function()
+        it("asks the guild at login and when the roster allows it", function()
+            local c = NewClient({ client = client })
+            assert.equal(1, c.guildRequests)
+            c:Fire("GUILD_ROSTER_UPDATE", false)
+            c:Fire("GUILD_ROSTER_UPDATE", true)
+            assert.equal(2, c.guildRequests)
+        end)
+
+        it("sends none of the Classic Era messages and inspects nobody", function()
+            local c = NewClient({ client = client, group = { bob() } })
+            c:Wait(10)
+            assert.is_nil(c.prefix)
+            assert.same({}, c.inspects)
+        end)
+    end)
+end
+
+describe("on Retail", function()
     it("takes the player's icon from LibSpecialization", function()
-        local client = NewClient({ client = "forever", specId = 70 })
+        local client = NewClient({ client = "retail", specId = 70 })
         assert.equal(icon(5070), client:Icon("Me-Realm"))
         client.specId = 66
         client.lib.player()
@@ -308,25 +327,44 @@ describe("on WoW Forever", function()
     end)
 
     it("takes guild and group members' icons from LibSpecialization", function()
-        local client = NewClient({ client = "forever" })
+        local client = NewClient({ client = "retail" })
         client.lib.guild(65, "HEALER", "RANGED", "Bob")
         client.lib.group(73, "TANK", "MELEE", "Ann-Other")
         assert.equal(icon(5065), client:Icon("Bob-Realm"))
         assert.equal(icon(5073), client:Icon("Ann-Other"))
     end)
+end)
 
-    it("asks the guild at login and when the roster allows it", function()
-        local client = NewClient({ client = "forever" })
-        assert.equal(1, client.guildRequests)
-        client:Fire("GUILD_ROSTER_UPDATE", false)
-        client:Fire("GUILD_ROSTER_UPDATE", true)
-        assert.equal(2, client.guildRequests)
+-- Forever has one spec per class, so LibSpecialization reports the talent group (tree) with the
+-- most points. The icons are the game's own, from its talent tree skill lines.
+describe("on WoW Forever", function()
+    local ARMS, FURY, HOLY_PRIEST, RESTORATION_DRUID = 11650, 11657, 11615, 11340
+
+    it("takes the player's icon from their top talent tree", function()
+        local client = NewClient({ client = "forever", specId = ARMS })
+        assert.equal(icon(132292), client:Icon("Me-Realm"))
+        client.specId = FURY
+        client.lib.player()
+        assert.equal(icon(132347), client:Icon("Me-Realm"))
     end)
 
-    it("sends none of the Classic Era messages and inspects nobody", function()
-        local client = NewClient({ client = "forever", group = { bob() } })
-        client:Wait(10)
-        assert.is_nil(client.prefix)
-        assert.same({}, client.inspects)
+    it("gives the player no icon before a point is spent", function()
+        local client = NewClient({ client = "forever", specId = false })
+        assert.is_nil(client:Icon("Me-Realm"))
+    end)
+
+    it("removes the player's icon when their points are reset", function()
+        local client = NewClient({ client = "forever", specId = ARMS })
+        client.specId = false
+        client.lib.player()
+        assert.is_nil(client:Icon("Me-Realm"))
+    end)
+
+    it("takes guild and group members' icons from their top talent tree", function()
+        local client = NewClient({ client = "forever" })
+        client.lib.guild(HOLY_PRIEST, "HEALER", "RANGED", "Bob")
+        client.lib.group(RESTORATION_DRUID, "HEALER", "RANGED", "Ann-Other")
+        assert.equal(icon(135920), client:Icon("Bob-Realm"))
+        assert.equal(icon(136041), client:Icon("Ann-Other"))
     end)
 end)

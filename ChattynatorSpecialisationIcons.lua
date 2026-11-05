@@ -79,10 +79,50 @@ local Lib = LibSpecialization ---@type LibSpecialization
 local GetSpecializationInfoForSpecID = GetSpecializationInfoForSpecID
 local GetUnitName = GetUnitName
 
+-- WoW Forever has one spec per class, so LibSpecialization reports the talent group (tree) with the
+-- most points instead, and the game has no lookup from a group ID to its icon for other players'
+-- classes. Icon file IDs from Forever's game data: each group's talents belong to a talent tree
+-- skill line (SkillLineAbility), whose SpellIconFileID is the tree's icon.
+---@type table<number, number> icon file ID per talent group ID
+local TREE_ICONS = {
+    [11582] = 135932, -- Mage: Arcane
+    [11594] = 135810, -- Mage: Fire
+    [11601] = 135846, -- Mage: Frost
+    [11328] = 136096, -- Druid: Balance
+    [11347] = 132276, -- Druid: Feral Combat
+    [11340] = 136041, -- Druid: Restoration
+    [11372] = 132164, -- Hunter: Beast Mastery
+    [11371] = 132222, -- Hunter: Marksmanship
+    [11370] = 132215, -- Hunter: Survival
+    [11486] = 135920, -- Paladin: Holy
+    [11541] = 135893, -- Paladin: Protection
+    [11559] = 135873, -- Paladin: Retribution
+    [11608] = 135987, -- Priest: Discipline
+    [11615] = 135920, -- Priest: Holy
+    [11622] = 136207, -- Priest: Shadow Magic
+    [11580] = 132292, -- Rogue: Assassination
+    [11573] = 132090, -- Rogue: Combat
+    [11572] = 132320, -- Rogue: Subtlety
+    [11326] = 136048, -- Shaman: Elemental Combat
+    [11363] = 136051, -- Shaman: Enhancement
+    [11362] = 136052, -- Shaman: Restoration
+    [11629] = 136145, -- Warlock: Affliction
+    [11636] = 136172, -- Warlock: Demonology
+    [11637] = 136186, -- Warlock: Destruction
+    [11650] = 132292, -- Warrior: Arms
+    [11657] = 132347, -- Warrior: Fury
+    [11670] = 132341, -- Warrior: Protection
+}
+
+---Sets a player's icon from what LibSpecialization reports.
 ---@param name string
----@param specId number
+---@param specId number? a spec ID, on Forever a talent group ID; nil before a point is spent
 local function setSpec(name, specId)
-    local _, _, _, icon = GetSpecializationInfoForSpecID(specId)
+    local icon = TREE_ICONS[specId] ---@type number?
+    if not icon and specId then
+        local _, _, _, specIcon = GetSpecializationInfoForSpecID(specId)
+        icon = specIcon
+    end
     ns.SetIcon(name, icon)
 end
 
