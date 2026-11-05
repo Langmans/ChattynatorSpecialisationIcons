@@ -1,5 +1,5 @@
 -- Puts a player's specialisation icon inside their name link in Chattynator. The icons come from
--- LibSpecialization where it runs (Retail, Forever); Era.lua finds them on Classic Era.
+-- LibSpecialization where it runs (Retail, Mists, Forever); Era.lua finds them on Classic Era and TBC.
 local addonName = ... ---@type string
 local ns = select(2, ...) ---@type ChattynatorSpecialisationIconsNS
 

@@ -1,4 +1,4 @@
-## Interface: 120000, 120001, 16001, 11509
+## Interface: 120000, 120001, 16001, 11509, 20506, 50504
 ## Title: Chattynator Specialisation Icons
 ## Category: Chat
 ## Version: @project-version@

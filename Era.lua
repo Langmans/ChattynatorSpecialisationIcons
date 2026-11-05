@@ -1,4 +1,4 @@
--- Classic Era has talent trees, not specialisations, and LibSpecialization does not run there.
+-- Classic Era and TBC have talent trees, not specialisations, and LibSpecialization does not run there.
 -- A player's icon is that of their tree with the most points. Sources, see README:
 --   the player's own trees; this addon's message from guild and group members who run it too;
 --   TacoTip's LibClassicInspector when loaded, else an inspect of group members in range.
